@@ -18,7 +18,7 @@ use Sys::Run;
 use Job::Manager;
 use Sys::RevoBackup::Job;
 
-extends 'Sys::Bprsync';
+extends 'Sys::Bprsync' => { -version => 0.17 };
 
 has 'bank' => (
     'is'       => 'ro',
