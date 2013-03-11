@@ -1,5 +1,8 @@
 Revision history for Sys-RevoBackup
 
+0.23    2013-03-12
+        Add ExecDir plugin
+
 0.22    2013-03-12
         Cleanup dependencies
 
