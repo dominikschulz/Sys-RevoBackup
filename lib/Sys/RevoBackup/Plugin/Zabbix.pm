@@ -1,5 +1,5 @@
 package Sys::RevoBackup::Plugin::Zabbix;
-# ABSTRACT: recobackup plugin for Zabbix::Sender
+# ABSTRACT: revobackup plugin for Zabbix::Sender
 
 use 5.010_000;
 use mro 'c3';

@@ -150,7 +150,7 @@ __END__
 
 Place the configuration inside /etc/revobackup/revobackup.conf
 
-    <VTK>
+    <Sys>
         <RevoBackup>
             bank = /srv/backup/bank
             <Rotations>
@@ -172,7 +172,7 @@ Place the configuration inside /etc/revobackup/revobackup.conf
                     </anotherhost>
             </Vaults>
         </RevoBackup>
-    </VTK>
+    </Sys>
 
 =head1 NAME
 
