@@ -198,7 +198,7 @@ sub _check_vault_ssh_connection {
     my $self = shift;
     my $hostname = shift;
 
-    if ( $self->revobackup()->sys()->run_remote_cmd( $hostname, '/bin/true' ) ) {
+    if ( $self->revobackup()->sys()->run_remote_cmd( $hostname, '/bin/true', { Timeout => 10, } ) ) {
         return 1;
     } else {
         return;
