@@ -33,6 +33,12 @@ has 'sys' => (
     'builder' => '_init_sys',
 );
 
+has 'job_filter' => (
+  'is'      => 'rw',
+  'isa'     => 'Str',
+  'default' => '',
+);
+
 with qw(Config::Yak::OrderedPlugins);
 
 sub _plugin_base_class { return 'Sys::RevoBackup::Plugin'; }
@@ -62,7 +68,12 @@ sub _init_jobs {
     my $verbose = $self->config()->get( $self->config_prefix() . '::Verbose' ) ? 1 : 0;
     my $dry     = $self->config()->get( $self->config_prefix() . '::Dry' )     ? 1 : 0;
 
-    foreach my $job_name ( @{$self->vaults()} ) {
+    VAULT: foreach my $job_name ( @{$self->vaults()} ) {
+      if($self->job_filter() && $job_name ne $self->job_filter()) {
+        # skip this job if it doesn't match the job filter
+        $self->logger()->log( message => 'Skipping Job '.$job_name.' because it does not match the filter', level => 'debug', );
+        next VAULT;
+      }
         try {
             my $Job = Sys::RevoBackup::Job::->new(
                 {

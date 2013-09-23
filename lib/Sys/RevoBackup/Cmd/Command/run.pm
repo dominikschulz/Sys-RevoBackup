@@ -26,6 +26,15 @@ has '_pidfile' => (
     'lazy'  => 1,
     'builder' => '_init_pidfile',
 );
+
+has 'job' => (
+  'is'    => 'ro',
+  'isa'   => 'Str',
+  'default' => '',
+  'traits'        => [qw(Getopt)],
+  'cmd_aliases'   => 'j',
+  'documentation' => 'Only execute this job',
+);
 # with ...
 # initializers ...
 sub _init_pidfile {
@@ -64,6 +73,10 @@ sub execute {
             'concurrency' => $concurrency,
         }
     );
+
+    if($self->job()) {
+      $Revo->job_filter($self->job());
+    }
 
     my $status = $Revo->run();
 
