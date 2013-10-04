@@ -1,5 +1,8 @@
 Revision history for Sys-RevoBackup
 
+0.24    2013-10-04
+        Add single job execution option
+
 0.23    2013-03-12
         Add ExecDir plugin
 

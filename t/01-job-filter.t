@@ -23,7 +23,7 @@ my $args = {
     'bank'      => $tempdir,
     'concurrency' => 1,
     'job_filter' => 'bananas',
-  }
+};
 my $Revo = Sys::RevoBackup::->new($args);
 
 my $Jobs = $Revo->jobs();
