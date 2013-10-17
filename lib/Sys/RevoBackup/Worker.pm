@@ -314,8 +314,8 @@ sub _cleanup {
     # Transfer the summary logfile to the host backed up
     $self->_upload_summary_log($logfile);
 
-    # rotate the backup
-    if ( $self->rotation() eq 'inprogress' ) {
+    # Rotate the backup, but only on successfull backups
+    if ( $self->rotation() eq 'inprogress' && $ok ) {
         my $arg_ref = {
             'logger'  => $self->logger(),
             'sys'     => $self->sys(),
@@ -336,6 +336,8 @@ sub _cleanup {
 
         my $Rotor = Sys::RotateBackup::->new($arg_ref);
         $Rotor->rotate();
+    } else {
+      $self->logger()->log( message => 'Not rotating a failed backup!', level => 'debug', );
     }
 
     return 1;
