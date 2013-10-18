@@ -1,5 +1,8 @@
 Revision history for Sys-RevoBackup
 
+0.25    2013-10-18
+        Only rotate on success.
+
 0.24    2013-10-04
         Add single job execution option
 
