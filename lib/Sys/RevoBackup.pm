@@ -67,6 +67,7 @@ sub _init_jobs {
 
     my $verbose = $self->config()->get( $self->config_prefix() . '::Verbose' ) ? 1 : 0;
     my $dry     = $self->config()->get( $self->config_prefix() . '::Dry' )     ? 1 : 0;
+    my $sudo    = $self->config()->get( $self->config_prefix() . '::Sudo' )    ? 1 : 0;
 
     VAULT: foreach my $job_name ( @{$self->vaults()} ) {
       if($self->job_filter() && $job_name ne $self->job_filter()) {
@@ -85,6 +86,7 @@ sub _init_jobs {
                     'bank'    => $self->bank(),
                     'vault'   => $job_name,
                     'dry'     => $dry,
+                    'sudo'    => $sudo,
                 }
             );
             $JQ->add($Job);

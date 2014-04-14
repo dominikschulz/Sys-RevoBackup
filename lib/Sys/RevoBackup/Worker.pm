@@ -58,6 +58,12 @@ has 'linkdir' => (
     'default' => sub { [] },
 );
 
+has 'sudo'    => (
+    'is'      => 'ro',
+    'isa'     => 'Bool',
+    'default' => 0,
+);
+
 # loosen the inherited requirement
 # the base class (bprsync) requires a destination
 # but revobackup generates it itself
@@ -422,6 +428,12 @@ override '_rsync_cmd' => sub {
     } else {
         my $dir = $self->dir_last_tree() || '';
         $self->logger()->log( message => 'No last rotation tree for this job found. Can not hardlink. Dir: '.$dir, level => 'warning', );
+    }
+
+    # If we do not have root access to the target host, we can also use
+    # sudo to run rsync on the source host as root.
+    if ( $self->sudo() ) {
+      $opts .= ' --rsync-path="/usr/bin/sudo /usr/bin/rsync"';
     }
 
     # Rsync after 2.6.4 supports multiple link-dest options.
