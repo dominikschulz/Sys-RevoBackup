@@ -58,12 +58,6 @@ has 'linkdir' => (
     'default' => sub { [] },
 );
 
-has 'sudo'    => (
-    'is'      => 'ro',
-    'isa'     => 'Bool',
-    'default' => 0,
-);
-
 # loosen the inherited requirement
 # the base class (bprsync) requires a destination
 # but revobackup generates it itself
@@ -97,6 +91,8 @@ sub _init_job_prefix {
 sub _init {
     my $self = shift;
 
+    return 1 if $self->_init_done();
+
     $self->{'hardlink'}    = 1;
     $self->{'delete'}      = 1;
     $self->{'numericids'}  = 1;
@@ -107,8 +103,9 @@ sub _init {
     # get everything else from the config ...
     # scalars ...
     my $common_config_prefix = $self->parent()->config_prefix() . q{::} . $self->_job_prefix() . q{::} . $self->name() . q{::};
-    foreach my $key (qw(description timeframe excludefrom rsh rshopts compression options bwlimit source nocrossfs)) {
-        if ( !defined( $self->{$key} ) ) {
+    foreach my $key (qw(description timeframe excludefrom rsh rshopts compression options bwlimit source nocrossfs sudo)) {
+        my $predicate = 'has_'.$key;
+        if ( !$self->$predicate() ) {
             my $config_key = $common_config_prefix . $key;
             my $val        = $self->parent()->config()->get($config_key);
             if ( defined($val) ) {
@@ -119,7 +116,9 @@ sub _init {
                 my $msg = 'Recommended configuration key '.$key.' ('.$config_key.') not found!';
                 $self->parent()->logger()->log( message => $msg, level => 'debug', );
             }
-        }
+          } else {
+            $self->parent()->logger()->log( message => 'Key '.$key.' ('.$common_config_prefix.$key.') was already set to '.$self->$key(), level => 'debug', );
+          }
     }
 
     # arrays ...
@@ -138,6 +137,8 @@ sub _init {
         $self->logger()->log( message => 'Setting default value of nocrossfs to 1 because it was not previously defined.', level => 'debug', );
         $self->{'nocrossfs'} = 1;
     }
+
+    $self->_init_done(1);
 
     return 1;
 }
@@ -419,6 +420,8 @@ sub _find_last_working_backup {
 
 override '_rsync_cmd' => sub {
     my $self = shift;
+
+    $self->_init();
 
     my ( $cmd, $opts, $dirs ) = super();
 

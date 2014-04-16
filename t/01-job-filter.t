@@ -1,6 +1,6 @@
 #!perl -T
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Sys::RevoBackup;
 use Config::Yak;
 use Test::MockObject::Universal;
@@ -57,6 +57,7 @@ $Jobs = undef;
 #
 # Setup new object to test our sudo feature
 #
+# this setting is deprecated and should not trigger sudo being present in command
 $Cfg->set('Sys::RevoBackup::Sudo',1);
 
 $Revo = Sys::RevoBackup::->new($args);
@@ -64,8 +65,27 @@ $Jobs = $Revo->jobs();
 
 my $Worker = $Jobs->jobs()->[0]->worker();
 my $rsync_cmd = $Worker->_rsync_cmd();
-like( $rsync_cmd, qr/--rsync-path=.*sudo.*rsync/, 'Rsync CMD contains rsync path w/ sudo');
+unlike( $rsync_cmd, qr/--rsync-path=.*sudo.*rsync/, 'Rsync CMD contains rsync path w/o sudo');
 
+#
+# Reset Object
+#
+$Revo   = undef;
+$Jobs   = undef;
+$Worker = undef;
+$rsync_cmd = undef;
+
+# this is the new way of setting sudo
+print $Cfg->dump();
+$Cfg->set('Sys::RevoBackup::Vaults::Apple::Sudo',1);
+$Cfg->set('Sys::RevoBackup::Vaults::Bananas::Sudo',1);
+
+$Revo = Sys::RevoBackup::->new($args);
+$Jobs = $Revo->jobs();
+
+my $Worker = $Jobs->jobs()->[0]->worker();
+my $rsync_cmd = $Worker->_rsync_cmd();
+like( $rsync_cmd, qr/--rsync-path=.*sudo.*rsync/, 'Rsync CMD contains rsync path w/ sudo');
 #
 # Reset Object
 #

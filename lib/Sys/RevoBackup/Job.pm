@@ -24,12 +24,6 @@ foreach my $key (qw(bank vault)) {
     );
 }
 
-has 'sudo'    => (
-    'is'      => 'ro',
-    'isa'     => 'Bool',
-    'default' => 0,
-);
-
 sub _startup {
     my $self = shift;
 
@@ -54,7 +48,6 @@ sub _init_worker {
             'bank'    => $self->bank(),
             'vault'   => $self->vault(),
             'dry'     => $self->dry(),
-            'sudo'    => $self->sudo(),
         }
     );
     return $Worker;

@@ -1,5 +1,9 @@
 Revision history for Sys-RevoBackup
 
+0.26    2014-04-16
+        Fix handling of uninitialized parameters in _init.
+        Add sudo option.
+
 0.25    2013-10-18
         Only rotate on success.
 
