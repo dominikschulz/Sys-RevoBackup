@@ -46,7 +46,10 @@ sub _plugin_base_class { return 'Sys::RevoBackup::Plugin'; }
 sub _init_sys {
     my $self = shift;
 
-    my $Sys = Sys::Run::->new( { 'logger' => $self->logger(), } );
+    my $Sys = Sys::Run::->new( {
+      'logger' => $self->logger(),
+      'ssh_hostkey_check' => 0,
+    } );
 
     return $Sys;
 }

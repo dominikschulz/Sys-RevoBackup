@@ -1,6 +1,6 @@
 #!perl -T
 
-use Test::More tests => 5;
+use Test::More tests => 7;
 use Sys::RevoBackup;
 use Config::Yak;
 use Test::MockObject::Universal;
@@ -86,6 +86,8 @@ $Jobs = $Revo->jobs();
 my $Worker = $Jobs->jobs()->[0]->worker();
 my $rsync_cmd = $Worker->_rsync_cmd();
 like( $rsync_cmd, qr/--rsync-path=.*sudo.*rsync/, 'Rsync CMD contains rsync path w/ sudo');
+like( $rsync_cmd, qr/-oBatchMode=yes/, 'SSH Options contain ssh Batch Mode');
+like( $rsync_cmd, qr/-oStrictHostKeyChecking=no/, 'SSH Options do contain StrictHostKeyChecking=no');
 #
 # Reset Object
 #
