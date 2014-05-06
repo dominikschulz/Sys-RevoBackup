@@ -1,6 +1,6 @@
 #!perl -T
 
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Sys::RevoBackup;
 use Config::Yak;
 use Test::MockObject::Universal;
@@ -96,3 +96,22 @@ $Jobs   = undef;
 $Worker = undef;
 $rsync_cmd = undef;
 
+# test arcfour
+print $Cfg->dump();
+$Cfg->set('Sys::RevoBackup::Vaults::Apple::Rshopts','-carcfour');
+$Cfg->set('Sys::RevoBackup::Vaults::Bananas::Rshopts','-carcfour');
+
+$Revo = Sys::RevoBackup::->new($args);
+$Jobs = $Revo->jobs();
+
+my $Worker = $Jobs->jobs()->[0]->worker();
+my $rsync_cmd = $Worker->_rsync_cmd();
+like( $rsync_cmd, qr/-carcfour/, 'SSH is passed the arcfour option');
+
+#
+# Reset Object
+#
+$Revo   = undef;
+$Jobs   = undef;
+$Worker = undef;
+$rsync_cmd = undef;
