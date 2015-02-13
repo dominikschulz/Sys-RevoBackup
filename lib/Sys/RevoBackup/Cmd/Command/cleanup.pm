@@ -1,4 +1,5 @@
 package Sys::RevoBackup::Cmd::Command::cleanup;
+
 # ABSTRACT: cleanup command
 
 use 5.010_000;
@@ -19,46 +20,44 @@ use Sys::RotateBackup;
 
 # extends ...
 extends 'Sys::RevoBackup::Cmd::Command';
+
 # has ...
 # with ...
 # initializers ...
 
 # your code here ...
 sub execute {
-    my $self = shift;
+  my $self = shift;
 
-    my $Revo = Sys::RevoBackup::->new({
-        'config'    => $self->config(),
-        'logger'    => $self->logger(),
-        'logfile'     => $self->config()->get( 'Sys::RevoBackup::Logfile', { Default => '/tmp/revo.log', } ),
-        'bank' => $self->config()->get('Sys::RevoBackup::Bank', { Default => '/srv/backup/revobackup', } ),
-        'concurrency' => 1,
-    });
-
-    my $vault_ref = $Revo->vaults();
-    if($vault_ref && ref($vault_ref) eq 'ARRAY') {
-        foreach my $vault (sort @{$vault_ref}) {
-            # rotate the backups
-            my $Rotor = Sys::RotateBackup::->new(
-                {
-                    'logger'  => $self->logger(),
-                    'sys'     => $Revo->sys(),
-                    'vault'   => $Revo->fs()->filename( ( $Revo->bank(), $vault ) ),
-                    'daily'   => $self->config()->get( 'RevoBackup::Rotations::Daily', { Default => 10, } ),
-                    'weekly'  => $self->config()->get( 'RevoBackup::Rotations::Weekly', { Default => 4, } ),
-                    'monthly' => $self->config()->get( 'RevoBackup::Rotations::Monthly', { Default => 12, } ),
-                    'yearly'  => $self->config()->get( 'RevoBackup::Rotations::Yearly', { Default => 10, } ),
-                }
-            );
-            $Rotor->cleanup();
-        }
+  my $Revo = Sys::RevoBackup::->new(
+    {
+      'config'      => $self->config(),
+      'logger'      => $self->logger(),
+      'logfile'     => $self->config()->get( 'Sys::RevoBackup::Logfile', { Default => '/tmp/revo.log', } ),
+      'bank'        => $self->config()->get( 'Sys::RevoBackup::Bank', { Default => '/srv/backup/revobackup', } ),
+      'concurrency' => 1,
     }
+  );
 
-    return 1;
-}
+  my $vault_ref = $Revo->vaults();
+  if ( $vault_ref && ref($vault_ref) eq 'ARRAY' ) {
+    foreach my $vault ( sort @{$vault_ref} ) {
+      # rotate the backups
+      my $Rotor = $Revo->create_rotator( $vault );
+      if($Rotor->cleanup()) {
+          $self->logger()->log( message => 'Successfully cleaned up vault '.$self->vault(), level => 'debug', );
+        } else {
+          $self->logger()->log( message => 'Failed to clean up vault '.$self->vault(), level => 'warning', );
+        }
+      $Rotor = undef;
+    } ## end foreach my $vault ( sort @{...})
+  } ## end if ( $vault_ref && ref...)
+
+  return 1;
+} ## end sub execute
 
 sub abstract {
-    return 'Cleanup old and/or broken backups';
+  return 'Cleanup old and/or broken backups';
 }
 
 no Moose;

@@ -1,4 +1,5 @@
 package Sys::RevoBackup::Cmd::Command::backupcheck;
+
 # ABSTRACT: backup integrity check command
 
 use 5.010_000;
@@ -18,34 +19,36 @@ use Sys::RevoBackup::Utils;
 
 # extends ...
 extends 'Sys::RevoBackup::Cmd::Command';
+
 # has ...
 has 'host' => (
-    'is'            => 'ro',
-    'isa'           => 'Bool',
-    'required'      => 1,
-    'default'       => 0,
-    'traits'        => [qw(Getopt)],
-    'cmd_aliases'   => 'h',
-    'documentation' => 'Host to check',
+  'is'            => 'ro',
+  'isa'           => 'Bool',
+  'required'      => 1,
+  'default'       => 0,
+  'traits'        => [qw(Getopt)],
+  'cmd_aliases'   => 'h',
+  'documentation' => 'Host to check',
 );
+
 # with ...
 # initializers ...
 
 # your code here ...
 sub execute {
-    my $self = shift;
+  my $self = shift;
 
-    # Helper method for monitoring, just look up the last status to the given hostname
-    if ( Sys::RevoBackup::Utils::backup_status( $self->config(), $self->host() ) ) {
-        print "1\n";
-        return 1;
-    }
-    print "0\n";
+  # Helper method for monitoring, just look up the last status to the given hostname
+  if ( Sys::RevoBackup::Utils::backup_status( $self->config(), $self->host() ) ) {
+    print "1\n";
     return 1;
-}
+  }
+  print "0\n";
+  return 1;
+} ## end sub execute
 
 sub abstract {
-    return 'Check backup integrity';
+  return 'Check backup integrity';
 }
 
 no Moose;

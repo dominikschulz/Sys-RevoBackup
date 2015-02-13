@@ -16,7 +16,7 @@ use Sys::RevoBackup::Worker;
 
 extends 'Sys::Bprsync::Job';
 
-foreach my $key (qw(bank vault)) {
+foreach my $key (qw(bank)) {
     has $key => (
         'is'       => 'ro',
         'isa'      => 'Str',
@@ -46,7 +46,6 @@ sub _init_worker {
             'name'    => $self->name(),
             'verbose' => $self->verbose(),
             'bank'    => $self->bank(),
-            'vault'   => $self->vault(),
             'dry'     => $self->dry(),
         }
     );

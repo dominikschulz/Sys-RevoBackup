@@ -1,4 +1,5 @@
 package Sys::RevoBackup::Cmd::Command::run;
+
 # ABSTRACT: run revobackup
 
 use 5.010_000;
@@ -19,74 +20,78 @@ use Sys::RevoBackup;
 
 # extends ...
 extends 'Sys::RevoBackup::Cmd::Command';
+
 # has ...
 has '_pidfile' => (
-    'is'    => 'ro',
-    'isa'   => 'Linux::Pidfile',
-    'lazy'  => 1,
-    'builder' => '_init_pidfile',
+  'is'      => 'ro',
+  'isa'     => 'Linux::Pidfile',
+  'lazy'    => 1,
+  'builder' => '_init_pidfile',
 );
 
 has 'job' => (
-  'is'    => 'ro',
-  'isa'   => 'Str',
-  'default' => '',
+  'is'            => 'ro',
+  'isa'           => 'Str',
+  'default'       => '',
   'traits'        => [qw(Getopt)],
   'cmd_aliases'   => 'j',
   'documentation' => 'Only execute this job',
 );
+
 # with ...
 # initializers ...
 sub _init_pidfile {
-    my $self = shift;
+  my $self = shift;
 
-    my $PID = Linux::Pidfile::->new({
-        'pidfile'   => $self->config()->get('Revobackup::Pidfile', { Default => '/var/run/revobackup.pid', }),
-        'logger'    => $self->logger(),
-    });
+  my $PID = Linux::Pidfile::->new(
+    {
+      'pidfile' => $self->config()->get( 'Revobackup::Pidfile', { Default => '/var/run/revobackup.pid', } ),
+      'logger'  => $self->logger(),
+    }
+  );
 
-    return $PID;
-}
+  return $PID;
+} ## end sub _init_pidfile
 
 # your code here ...
 sub execute {
-    my $self = shift;
+  my $self = shift;
 
-    $self->_pidfile()->create() or die('Script already running.');
+  $self->_pidfile()->create() or die('Script already running.');
 
-    my $bankdir = $self->config()->get('Sys::RevoBackup::Bank');
-    if ( !$bankdir ) {
-        die('Bankdir not defined. You must set Sys::RevoBackup::bank to an existing directory! Aborting!');
+  my $bankdir = $self->config()->get('Sys::RevoBackup::Bank');
+  if ( !$bankdir ) {
+    die('Bankdir not defined. You must set Sys::RevoBackup::bank to an existing directory! Aborting!');
+  }
+  if ( !-d $bankdir ) {
+    die( 'Bankdir (' . $bankdir . ') not found. You must set Sys::RevoBackup::bank to an existing directory! Aborting!' );
+  }
+
+  my $concurrency = $self->config()->get( 'Sys::RevoBackup::Concurrency', { Default => 1, } );
+
+  my $Revo = Sys::RevoBackup::->new(
+    {
+      'config'      => $self->config(),
+      'logger'      => $self->logger(),
+      'logfile'     => $self->config()->get( 'Sys::RevoBackup::Logfile', { Default => '/tmp/revo.log' } ),
+      'bank'        => $bankdir,
+      'concurrency' => $concurrency,
     }
-    if ( !-d $bankdir ) {
-        die('Bankdir ('.$bankdir.') not found. You must set Sys::RevoBackup::bank to an existing directory! Aborting!');
-    }
+  );
 
-    my $concurrency = $self->config()->get( 'Sys::RevoBackup::Concurrency', { Default => 1, } );
+  if ( $self->job() ) {
+    $Revo->job_filter( $self->job() );
+  }
 
-    my $Revo = Sys::RevoBackup::->new(
-        {
-            'config'      => $self->config(),
-            'logger'      => $self->logger(),
-            'logfile'     => $self->config()->get( 'Sys::RevoBackup::Logfile', { Default => '/tmp/revo.log' } ),
-            'bank'        => $bankdir,
-            'concurrency' => $concurrency,
-        }
-    );
+  my $status = $Revo->run();
 
-    if($self->job()) {
-      $Revo->job_filter($self->job());
-    }
+  $self->_pidfile()->remove();
 
-    my $status = $Revo->run();
-
-    $self->_pidfile()->remove();
-
-    return $status;
-}
+  return $status;
+} ## end sub execute
 
 sub abstract {
-    return 'Make some backups';
+  return 'Make some backups';
 }
 
 no Moose;

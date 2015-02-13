@@ -1,0 +1,12 @@
+-syn	# check syntax
+-l=160	# break lines after 160 chars
+-i=2  # intendate 2 spaces
+-nce	# no cuddled else
+-nbl	# no opening brace on new line
+-b	# backup and modify in place
+-ole=unix	# make sure line endings are always unix (\n)
+#-conv	# run as long as perltidy changes smth. (ensures stable result)
+#-it=2
+-csc	# add closing side comments after long blocks
+-sbc	# use static block comments, i.e. special rules for ## prefixed comments
+-bbc	# blanks before comments, i.e. a empty line before full line comments

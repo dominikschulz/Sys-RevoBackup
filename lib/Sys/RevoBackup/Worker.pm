@@ -25,7 +25,7 @@ sub _check_timeframe {
     return 1;
 }
 
-foreach my $key (qw(bank vault)) {
+foreach my $key (qw(bank)) {
     has $key => (
         'is'       => 'ro',
         'isa'      => 'Str',
@@ -323,31 +323,28 @@ sub _cleanup {
 
     # Rotate the backup, but only on successfull backups
     if ( $self->rotation() eq 'inprogress' && $ok ) {
-        my $arg_ref = {
-            'logger'  => $self->logger(),
-            'sys'     => $self->sys(),
-            'vault'   => $self->fs()->filename( ( $self->bank(), $self->vault() ) ),
-            'daily'   => $self->config()->get( 'Sys::RevoBackup::Rotations::Daily', { Default => 10, } ),
-            'weekly'  => $self->config()->get( 'Sys::RevoBackup::Rotations::Weekly', { Default => 4, } ),
-            'monthly' => $self->config()->get( 'Sys::RevoBackup::Rotations::Monthly', { Default => 12, } ),
-            'yearly'  => $self->config()->get( 'Sys::RevoBackup::Rotations::Yearly', { Default => 10, } ),
-        };
-
-        my $common_prefix = $self->parent()->config_prefix() . q{::} . $self->_job_prefix() . q{::} . $self->name() . q{::};
-        if ( $self->config()->get( $common_prefix . 'Rotations' ) ) {
-            $arg_ref->{'daily'}   = $self->config()->get( $common_prefix . 'Rotations::Daily',   { Default => 10, } );
-            $arg_ref->{'weekly'}  = $self->config()->get( $common_prefix . 'Rotations::Weekly',  { Default => 4, } );
-            $arg_ref->{'monthly'} = $self->config()->get( $common_prefix . 'Rotations::Monthly', { Default => 12, } );
-            $arg_ref->{'yearly'}  = $self->config()->get( $common_prefix . 'Rotations::Yearly',  { Default => 10, } );
+        my $Rotor = $self->parent()->create_rotator( $self->vault() );
+        if($Rotor->rotate()) {
+          $self->logger()->log( message => 'Successfully rotated vault '.$self->vault(), level => 'debug', );
+        } else {
+          $self->logger()->log( message => 'Failed to rotate vault '.$self->vault(), level => 'warning', );
         }
-
-        my $Rotor = Sys::RotateBackup::->new($arg_ref);
-        $Rotor->rotate();
+        $Rotor = undef;
     } else {
       $self->logger()->log( message => 'Not rotating a failed backup!', level => 'debug', );
     }
 
     return 1;
+}
+
+=method vault
+
+Alias method name to vault
+
+=cut
+sub vault {
+  my $self = shift;
+  return $self->name();
 }
 
 sub _upload_summary_log {

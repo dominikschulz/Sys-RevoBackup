@@ -12,3 +12,4 @@ cover_db
 pod2htm*.tmp
 Sys-RevoBackup-*
 Debian_CPANTS.txt
+*.bak

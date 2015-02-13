@@ -1,5 +1,8 @@
 Revision history for Sys-RevoBackup
 
+0.28    2015-02-13
+        Fix cleanup command.
+
 0.27    2014-04-22
         Disable strict host key checking.
 
