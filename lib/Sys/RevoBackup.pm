@@ -15,6 +15,7 @@ use English qw( -no_match_vars );
 use Try::Tiny;
 
 use Sys::Run;
+use Sys::FS;
 use Job::Manager;
 use Sys::RevoBackup::Job;
 
@@ -38,6 +39,26 @@ has 'job_filter' => (
   'isa'     => 'Str',
   'default' => '',
 );
+
+has 'fs' => (
+    'is'      => 'rw',
+    'isa'     => 'Sys::FS',
+    'lazy'    => 1,
+    'builder' => '_init_fs',
+);
+
+sub _init_fs {
+    my $self = shift;
+
+    my $FS = Sys::FS::->new(
+        {
+            'logger' => $self->logger(),
+            'sys'    => $self->sys(),
+        }
+    );
+
+    return $FS;
+}
 
 with qw(Config::Yak::OrderedPlugins);
 
