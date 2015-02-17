@@ -1,5 +1,8 @@
 Revision history for Sys-RevoBackup
 
+0.29    2015-02-17
+        Fix undefined accessor.
+
 0.28    2015-02-13
         Fix cleanup command.
 

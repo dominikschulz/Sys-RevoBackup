@@ -156,7 +156,7 @@ sub create_rotator {
     'yearly'  => $self->config()->get( 'RevoBackup::Rotations::Yearly', { Default => 10, } ),
   };
 
-  my $common_prefix = $self->parent()->config_prefix() . q{::} . $self->_job_prefix() . q{::} . $vault . q{::};
+  my $common_prefix = $self->config_prefix() . q{::} . $self->_job_prefix() . q{::} . $vault . q{::};
 
   if ( $self->config()->get( $common_prefix . 'Rotations' ) ) {
     $arg_ref->{'daily'}   = $self->config()->get( $common_prefix . 'Rotations::Daily',   { Default => 10, } );
