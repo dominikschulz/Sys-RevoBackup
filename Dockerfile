@@ -15,8 +15,17 @@ RUN apt-get update --yes && apt-get install --yes --force-yes --no-install-recom
   perltidy \
   && rm -rf /var/lib/apt/lists/*
 
-RUN cpanm \
-  Log::Tree
+RUN cpanm --force \
+  Config::Yak \
+  Job::Manager \
+  Log::Tree \
+  Sys::Bprsync \
+  Sys::FS \
+  Sys::RotateBackup \
+  Sys::Run
 
 ADD . /srv/revobackup
 WORKDIR /srv/revobackup
+
+RUN chmod +x /srv/revobackup/bin/revobackup.pl
+ENV PERL5LIB /srv/revobackup/lib
