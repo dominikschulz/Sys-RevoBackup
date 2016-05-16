@@ -1,0 +1,8 @@
+revobackup:
+  #image: 'revobackup:latest'
+  build: .
+  restart: 'unless-stopped'
+  volumes:
+    - '/srv/revobackup/.ssh:/root/.ssh:ro'
+    - '/srv/revobackup/conf.d:/etc/revobackup/conf.d:ro'
+    - '/srv/revobackup/bank:/srv/backup/revobackup:rw'

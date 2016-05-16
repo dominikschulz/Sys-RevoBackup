@@ -9,7 +9,7 @@ use Sys::RevoBackup::Cmd;
 my $Cmd = Sys::RevoBackup::Cmd::->new();
 $Cmd->run();
 
-exit 1;
+exit 0;
 
 __END__
 

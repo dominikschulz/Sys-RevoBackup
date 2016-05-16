@@ -1,0 +1,10 @@
+<Sys>
+  <RevoBackup>
+    <Vaults>
+      <home>
+        source = host:/home/
+        excludefrom=/etc/revobackup/default.xcl
+      </home>
+    </Vaults>
+  </RevoBackup>
+</Sys>

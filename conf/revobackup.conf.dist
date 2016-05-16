@@ -1,0 +1,11 @@
+<Sys>
+        <RevoBackup>
+                Bank = /srv/backup/revobackup
+                Concurrency = 2
+                <Rotations>
+                        daily = 7
+                        weekly = 0
+                        monthly = 3
+                </Rotations>
+        </RevoBackup>
+</Sys>

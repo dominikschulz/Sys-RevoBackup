@@ -50,7 +50,10 @@ sub _init_config {
 sub _init_logger {
     my $self = shift;
 
-    my $Logger = Log::Tree::->new('revobackup');
+    my $Logger = Log::Tree::->new(
+      facility => 'revobackup',
+      verbosity => 4,
+    );
 
     return $Logger;
 }
